@@ -1,0 +1,6 @@
+TODO List - Robert
+==================
+- Check robotBase.py works with X-forward, Y-left, theta counterclockwise.
+- Check offset angle for Robert 2.0 (currently 267degrees)
+- Check ransac.py displays x,y correctly.
+- Add an x,y,theta key to Ransac graph.
