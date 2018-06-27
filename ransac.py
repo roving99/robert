@@ -26,24 +26,14 @@ TOPICNAME = "sense/output/lidar"
 def draw_background(gr):
     gr.draw_background()
 
-def draw_lidar(gr, readings):
-    for data in readings.keys():
-        angle = math.radians(data)
-        distance = readings[data][0]
-        strength = readings[data][1]
-        pos = (int(math.sin(angle)*distance), int(math.cos(angle)*distance)) 
-        radius = 1
-        gr.draw_circle(GREEN, pos, radius) 
-        gr.draw_line(GRAY, (0, 0), pos, 1)
-#        if data==180 or data==160:
-        if data>=startAngle and data<=endAngle:
-            gr.draw_line(WHITE, (0, 0), pos, 1)
-            
 def draw_cloud(gr, cloud):
     for data in cloud.keys():
         x = cloud[data][0]
         y = cloud[data][1]
         strength = cloud[data][2]
+        """
+        Zero degrees = up. Theta is counterclockwise.
+        """
         pos = (int(x), int(y))
         radius = 1
         gr.draw_circle(PURPLE, pos, radius) 

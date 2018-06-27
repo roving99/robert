@@ -116,7 +116,8 @@ if __name__ == '__main__':
     client = mqtt.Client()
     client.on_connect = mqttOnConnect
     client.on_message = mqttOnMessage
-    client.connect(world['ip'], 1883, 60)
+    client.connect("robert.local", 1883, 60)
+#    client.connect(world['ip'], 1883, 60)
     client.loop_start()
 
     print 'MQTT command'

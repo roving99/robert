@@ -3,7 +3,13 @@ import math
 
 class RobotBase():
 
-    def __init__(self, axleLength, wheelCircumference, countsPerWheel):   # Two wheel robot base. 
+    def __init__(self, axleLength, wheelCircumference, countsPerWheel):
+        """
+        Two wheeled robot base.
+        x is forward of Robot.
+        y is leftward.
+        theta is counterclockwise.
+        """
         self.wheel_spacing= axleLength
         self.wheel_circumference=wheelCircumference	# cm	
         self.wheel_counts_per_rev = countsPerWheel 

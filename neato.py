@@ -19,7 +19,8 @@ class Neato():
     """
     def __init__(self, portName, baud, offset=267):
         """
-        tries to open port.
+        Opens a serial port.
+        offset accounts for Lidar data not being aligned with Robert x axis (0degree not pointing forward).
         """
         self.portName = portName
         self.baud = baud
@@ -154,7 +155,11 @@ class Neato():
         count = 0
         while count<100:
             packet = self.getPacket()
+            """
+            0degrees points to front of Robert, and angles run counterclockwise
+            """
             angle = (packet[0][0]*4+self.offset)%360
+
             if packet[1][0]<32000:      # if distance is >2**13 there was a error - invalid data or poor strength
                 self.scan[angle] = packet[1]
             if packet[2][0]<32000:
@@ -188,27 +193,34 @@ class Neato():
     def toCloud(scan):
         """
         Calculate point cloud from a scan hash.
+        x is forward of Robert.
+        y is leftward.
+        theta is counterclockwise.
         """
         cloud = {}
         for index in scan.keys():
             angle = index # degrees
             distance = float(scan[index][0])
             strength = scan[index][1]
-            x = distance * math.sin(math.radians(angle))
-            y = -distance * math.cos(math.radians(angle))
+            x = distance * math.cos(math.radians(angle))
+            y = distance * math.sin(math.radians(angle))
             cloud[index] = (x, y, strength)
         return cloud
 
 def toCloud(scan):
+    """
+    Calculate point cloud from a scan hash.
+    x is forward of Robert.
+    y is leftward.
+    theta is counterclockwise.
+    """
     cloud = {}
     for index in scan.keys():
         angle = index # degrees
         distance = float(scan[index][0])
         strength = scan[index][1]
-#        x = int(distance * math.sin(math.radians(angle)))
-#        y = int(distance * math.cos(math.radians(angle)))
-        x = int(distance * math.sin(math.radians(angle)))
-        y = -int(distance * math.cos(math.radians(angle)))
+        x = int(distance * math.cos(math.radians(angle)))
+        y = int(distance * math.sin(math.radians(angle)))
         cloud[index] = (x, y, strength)
     return cloud
 
