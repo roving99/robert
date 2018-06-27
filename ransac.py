@@ -19,12 +19,13 @@ PURPLE = (255, 0, 255)
 RED = (255, 0, 0)
 PINK = (64, 0, 0)
 
-HOSTNAME = "robert.local"
-#HOSTNAME = "192.168.0.4"
+#HOSTNAME = "robert.local"
+HOSTNAME = "127.0.0.1"
 TOPICNAME = "sense/output/lidar"
 
 def draw_background(gr):
     gr.draw_background()
+    gr.draw_axis()
 
 def draw_cloud(gr, cloud):
     for data in cloud.keys():
@@ -36,18 +37,18 @@ def draw_cloud(gr, cloud):
         """
         pos = (int(x), int(y))
         radius = 1
-        gr.draw_circle(PURPLE, pos, radius) 
-        if wStart:
-            if data>=wStart and data<=wEnd:
-                gr.draw_line(RED, (0, 0), pos, 1)
-        if data>=startAngle and data<=endAngle:
-            gr.draw_line(WHITE, (0, 0), pos, 1)
-            
+        gr.draw_circle(GRAY, pos, radius) 
+        if data>350 or data<10:
+            gr.draw_circle(WHITE, pos, radius) 
+        if data>(90-10) and data<(90+10):
+            gr.draw_circle(RED, pos, radius) 
+        if data>(270-10) and data<(270+10):
+            gr.draw_circle(GREEN, pos, radius) 
 
 def prune(readings):    # remove erroneous readings from scan data
     keys = readings.keys()
     for key in keys:
-        if readings[key][0]>16000 or readings[key][0]<10:
+        if readings[key][0]>16000 or readings[key][0]<15:
             del readings[key]
     return readings
 
@@ -226,7 +227,6 @@ if __name__=="__main__":
                     done = True 
         if cloud:
             draw_background(myGraph)
-#            draw_lidar(myGraph, readings)
             if showCloud:
                 draw_cloud(myGraph, cloud)
 

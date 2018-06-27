@@ -86,6 +86,7 @@ if __name__=="__main__":
     prune(readings)
     cloud = neato.toCloud(readings)
 
+    print 'cloud =', cloud
     displayZoom = .10
     displayRotate = 0
     threshold = 0.100
@@ -103,6 +104,12 @@ if __name__=="__main__":
                 if event.key == pygame.K_DOWN:
                     displayZoom = displayZoom+0.02
                     myGraph.scale=displayZoom
+                if event.key == pygame.K_LEFT:
+                    readings = neato.rotated(readings, +5)
+                    cloud = neato.toCloud(readings)
+                if event.key == pygame.K_RIGHT:
+                    readings = neato.rotated(readings, -5)
+                    cloud = neato.toCloud(readings)
                 if event.key == pygame.K_q:
                     done = True 
 

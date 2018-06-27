@@ -231,6 +231,13 @@ def prune(readings):    # remove erroneous readings from scan data
             del readings[key]
     return readings
 
+def rotated(readings, angle):
+    result = {}
+    keys = readings.keys()
+    for key in keys:
+        result[(key+angle)%360] = readings[key]
+    return result    
+    
 if __name__=="__main__":
     portname = sys.argv[1]
     print 'NEATO HAckery v1.0'

@@ -30,8 +30,10 @@ class Graph(object):
         '''
         x = pos[0]
         y = pos[1]
-        px = x*self.scale+self.ox
-        py = self.high-(y*self.scale+self.oy)
+#        px = x*self.scale+self.ox
+#        py = self.high-(y*self.scale+self.oy)
+        px = self.ox-y*self.scale
+        py = self.oy-x*self.scale
         return int(px), int(py)
 
     def mouseToGraph(self, pos):
@@ -43,8 +45,8 @@ class Graph(object):
         return int(gx), int(gy)
 
     def draw_axis(self):
-        pygame.draw.line(self.surface, GRAY, self.dpos((-2000,0)), self.dpos((2000,0)), 1)
-        pygame.draw.line(self.surface, GRAY, self.dpos((0,-2000)), self.dpos((0,2000)), 1)
+        pygame.draw.line(self.surface, GRAY, self.dpos((-20000,0)), self.dpos((20000,0)), 1)
+        pygame.draw.line(self.surface, WHITE, self.dpos((0,-20000)), self.dpos((0,20000)), 1)
         #pygame.draw.circle(self.surface, WHITE, self.dpos((0,0)), 10)
 
     def draw_background(self):
