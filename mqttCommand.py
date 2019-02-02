@@ -4,6 +4,7 @@ import os
 import paho.mqtt.client as mqtt
 import time
 import json
+import sys
 
 '''
 Command-line interface to MQTT client controlling robot.
@@ -49,7 +50,8 @@ class MyPrompt(Cmd):
         """Status of monitored topics"""
         global TOPICNAMES
         for k in TOPICNAMES.keys():
-            print k,': ',TOPICNAMES[k]
+            if TOPICNAMES[k]:
+                print k,': ',TOPICNAMES[k]['data']
 
     def do_lidaron(self, args):
         """switch lidar motor ON"""
@@ -99,6 +101,7 @@ def mqttOnMessage(client, userdata, msg):
     payload = json.loads(payload)
     for t in TOPICNAMES.keys():
         if t==topic:
+            #print 'updated '+topic
             TOPICNAMES[t]= payload
 
 def mqttOnConnect(client, userdata, flags, rc):  # added 'flags' on work version of library?
@@ -116,7 +119,11 @@ if __name__ == '__main__':
     client = mqtt.Client()
     client.on_connect = mqttOnConnect
     client.on_message = mqttOnMessage
-    client.connect("robert.local", 1883, 60)
+    ip = world['ip']
+    if len(sys.argv)>1:
+        ip = sys.argv[1]
+    print "mqtt at "+ip
+    client.connect(ip, 1883, 60)
 #    client.connect(world['ip'], 1883, 60)
     client.loop_start()
 

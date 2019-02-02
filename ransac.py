@@ -115,6 +115,19 @@ def bounds(data):
         if y[i]<minY:
             minY=y[i]
     return (minX, minY), (maxX, maxY)
+
+def splitXY(cloud, start, end):
+    '''
+    return seperate lists of x and y coords of cloud samples between given angles
+    '''
+    keys = cloud.keys()
+    x = []
+    y = []
+    for i in range(start, end):
+        if i in keys:
+            x.append(cloud[i][0])
+            y.append(cloud[i][1])
+    return x,y
     
 
 def probableWall(cloud, start, end, d, f):
@@ -139,18 +152,23 @@ def probableWall(cloud, start, end, d, f):
         fit = percentageFit(data, m, b, d, tail=3)
     return start, end
 
-def splitXY(cloud, start, end):
-    '''
-    return seperate lists of x and y coords of cloud samples between given angles
-    '''
-    keys = cloud.keys()
-    x = []
-    y = []
-    for i in range(start, end):
-        if i in keys:
-            x.append(cloud[i][0])
-            y.append(cloud[i][1])
-    return x,y
+def findWalls(cloud):
+    walls=[]
+    wStart, wEnd = 0, 5     # Start looking at a 5degree section
+    while wEnd<360:
+        start, end = probableWall(cloud, wStart, wEnd, 15, 85) # look for wall
+        if start: # found a probable wall..
+            m, b = leastSquare(splitXY(cloud, start,end)) # calculate gradient/intersection of wall
+            pt1, pt2 = bounds(splitXY(cloud, start, end)) # NEED A BETTER WAY!    
+            myLine = line.Line(pt1, pt2)
+            if m<0:
+                myLine.flipX()
+            walls.append(myLine)
+            wStart = start
+            wEnd = end
+        wStart = wEnd
+        wEnd = wStart+5
+    return walls
 
 
 def mqttOnMessage(client, userdata, msg):
@@ -174,6 +192,12 @@ if __name__=="__main__":
     print 'RANSAC Hackery v1.0'
     print '=========+========='
     print 'Using data from mqtt topic', TOPICNAME    
+    print
+    print 'Up/down: zoom'
+    print 'Q: Quit'
+    print 'W: show walls'
+    print 'C: show cloud'
+    print 'P: print details'
     print
     cloud = False 
     
@@ -222,30 +246,24 @@ if __name__=="__main__":
                     showWalls = not showWalls
                 if event.key == pygame.K_c:
                     showCloud = not showCloud
+                if event.key == pygame.K_p:
+                    print 'Walls'
+                    print '====='
+                    for wall in allWalls:
+                        print wall.asText()
+                    print
                         
                 if event.key == pygame.K_q:
                     done = True 
         if cloud:
             draw_background(myGraph)
+            allWalls = findWalls(cloud)
             if showCloud:
                 draw_cloud(myGraph, cloud)
-
-            wStart, wEnd = 0, 5
-            while wEnd<360:
-                start, end = probableWall(cloud, wStart, wEnd, 15, 85) # look for wall
-                if start: # found a wall..
-                    m, b = leastSquare(splitXY(cloud, start,end)) # calculate gradient/intersection of wall
-                    pt1, pt2 = bounds(splitXY(cloud, start, end))    
-                    myLine = line.Line(pt1, pt2)
-                    if m<0:
-                        myLine.flipX()
-                    if showWalls:
-                        myGraph.draw_line_mb(PINK, m, b, 1)  # draw the extended wall
-                        myGraph.draw_Line(RED, myLine, 2)  # draw the wall                    
-                    wStart = start
-                    wEnd = end
-                wStart = wEnd
-                wEnd = wStart+5
+            if showWalls:
+                for wall in allWalls:
+                    #myGraph.draw_line_mb(PINK, m, b, 1)  # draw the extended wall
+                    myGraph.draw_Line(RED, wall, 2)  # draw the wall                    
 
         screen.blit(myGraph.surface, (0,0))
         pygame.display.flip()

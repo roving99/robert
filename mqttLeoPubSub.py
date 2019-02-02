@@ -158,8 +158,8 @@ if __name__=="__main__":
         data = {"time":time.time(), "type":"battery", "data":[battery]}
         client.publish(topic='drive/output/battery', payload=json.dumps(data))
 
-        data = {"time":time.time(), "type":"counters", "data":[counter1, counter2]}
-        client.publish(topic='drive/output/counters', payload=json.dumps(data))
+        data = {"time":time.time(), "type":"count", "data":[counter1, counter2]}
+        client.publish(topic='drive/output/count', payload=json.dumps(data))
 
         data = {"time":time.time(), "type":"pose", "data":[md25Base.x, md25Base.y, md25Base.theta]}
         client.publish(topic='odometry/output/pose', payload=json.dumps(data))

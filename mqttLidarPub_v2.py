@@ -34,12 +34,12 @@ if __name__=="__main__":
     print '==========+========='
     print
 
-    if os.path.isfile(sys.argv[1]+'.py'):
+    if os.path.isfile("test/"+sys.argv[1]+'.py'):
         updating = False
         myNeato = None
         test = importlib.import_module(sys.argv[1])
         readings = test.data
-        print 'Using test data set', sys.argv[1]
+        print 'Using test data set '+sys.argv[1]
         print 'data=',readings
     else:
         portname = sys.argv[1]
