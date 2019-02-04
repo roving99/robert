@@ -99,11 +99,13 @@ if __name__=="__main__":
                 done = True
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    displayZoom = displayZoom-0.02
-                    myGraph.scale=displayZoom
+                    #displayZoom = displayZoom-0.02
+                    #myGraph.scale=displayZoom
+                    cloud=neato.shiftCloud(cloud,-20)
                 if event.key == pygame.K_DOWN:
-                    displayZoom = displayZoom+0.02
-                    myGraph.scale=displayZoom
+                    #displayZoom = displayZoom+0.02
+                    #myGraph.scale=displayZoom
+                    cloud=neato.shiftCloud(cloud,+20)
                 if event.key == pygame.K_LEFT:
                     readings = neato.rotated(readings, +5)
                     cloud = neato.toCloud(readings)

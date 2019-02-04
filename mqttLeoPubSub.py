@@ -74,6 +74,17 @@ def doPose(payload):
     myLeo.send('04')        # reset counters on md25
     md25Base.reset()        # reset pose.
 
+def doTarget(payload):
+    print 'doTarget called'
+    if payload:
+        xTarget = payload[u'data'][0]
+        yTarget = payload[u'data'][1]
+        thetaTarget = payload[u'data'][2]
+    else
+        xTarget=none
+        yTarget=none
+        thetaTarget=none
+        
 TOPICNAMES = [
     ['drive/input/steer',  doSteer],
     ['drive/input/motors', doMotors],
@@ -144,6 +155,10 @@ if __name__=="__main__":
 
     md25Base = robotBase.RobotBase(30, 31.4159, 360)    # axle = 30cm(???), wheels 10cm diameter, 360 pulses per revolution
     md25Base.reset()
+
+    xTarget = none
+    yTarget = none
+    thetaTarget = none
 
     running = True
     while running:

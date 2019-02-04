@@ -209,7 +209,7 @@ class Neato():
 
 def toCloud(scan):
     """
-    Calculate point cloud from a scan hash.
+    Calculate point (x, y, theta) cloud from a scan hash.
     x is forward of Robert.
     y is leftward.
     theta is counterclockwise.
@@ -237,6 +237,13 @@ def rotated(readings, angle):
     for key in keys:
         result[(key+angle)%360] = readings[key]
     return result    
+
+def shiftCloud(cloud, delta):
+    result={}
+    for key in cloud.keys():
+        result[key]=cloud[key]
+        result[key]=(result[key][0]+delta,)+result[key][1:]  # neet way to change a value in a tuple!
+    return result
     
 if __name__=="__main__":
     portname = sys.argv[1]

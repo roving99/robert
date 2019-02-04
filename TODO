@@ -4,3 +4,27 @@ TODO List - Robert
 - Check offset angle for Robert 2.0 (currently 267degrees)
 - Check ransac.py displays x,y correctly.
 - Add an x,y,theta key to Ransac graph.
+
+
+Command-line interface to MQTT client controlling robot.
+========================================================
+sender				receiver		
+-------------------+-------------------+--------------------------------------------------------------------------------------
+					mqttLeoPubSub.py 	drive/input/steer  {"data": [<translate>, <rotate>], } cms-1, degrees-1
+					mqttLeoPubSub.py 	drive/input/motors {"data": [<motor left speed>, <motor right speed>], }   cms-1, cms-1
+					mqttLeoPubSub.py 	drive/input/leds   {"data": [led0, led1, led2, ..], }  n
+					mqttLeoPubSub.py 	drive/input/lidar  {"data": [0|1], }   on or off
+					mqttLeoPubSub.py 	drive/input/raw    {"data": [<string>], }  raw command to controlling arduino
+        
+mqttLeoPubSup.py						sense/output/lidar {"data": {[ <angle>:<distance>,<strength>],,,}}
+										sense/output/sonar {"data": { <angle>: <distance>, <angle>:<distance>, ...}, } degree, cm
+										sense/output/touch {"data": [ <touch0>, <touch1>, ...], }  0/1
+										sense/output/cliff {"data": [ <cliff0>, <cliff1>, ...], }  0/1
+										sense/output/compass   {"data": <bearing>, }   degree
+        
+mqttLeoPubSup.py						drive/output/count {"data": [<motor left count>, <motor right count>], }   
+mqttLeoPubSup.py						drive/output/battery   {"data": [<volts>], }   volts
+
+					mqttLeoPubSub.py	odometry/input/pose   {}    reset pose.
+mqttLeoPubSup.py						odometry/output/pose   {"data": [ <x>, <y>, <theta>], }    cm, cm, degree
+										odometry/output/rate   {"data": [ <dx>, <dy>, <dtheta>], } cms-1, cms-1, degrees-1
