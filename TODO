@@ -6,6 +6,14 @@ TODO List - Robert
 - Add an x,y,theta key to Ransac graph.
 
 
+#         
+#		 	x
+#			^
+#			|
+#			|		Theta counterclockwise from x axis.
+#	y <-----+  
+#
+
 Command-line interface to MQTT client controlling robot.
 ========================================================
 sender				receiver		
