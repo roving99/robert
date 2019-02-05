@@ -92,6 +92,7 @@ def doTarget(payload):
 
 def doPose(payload):
     print 'doPose called'
+    print payload
     p.setPose(payload[u'data'][0], payload[u'data'][1], payload[u'data'][2])
 
 
@@ -135,13 +136,13 @@ if __name__=="__main__":
         client.loop()
 
         if (time.time()-lastTime)>1.0:
-            data = {"time":time.time(), "type":"target", "data":[p.getTarget()]}
+            data = {"time":time.time(), "type":"target", "data":p.getTarget()}
             client.publish(topic='navigation/output/target', payload=json.dumps(data))
 
-            data = {"time":time.time(), "type":"steering", "data":[p.getSteering()]}
+            data = {"time":time.time(), "type":"steering", "data":p.getSteering()}
             client.publish(topic='navigation/output/steering', payload=json.dumps(data))
 
-            data = {"time":time.time(), "type":"bearing", "data":[p.getRelativeBearing()]}
+            data = {"time":time.time(), "type":"bearing", "data":p.getRelativeBearing()}
             client.publish(topic='navigation/output/bearing', payload=json.dumps(data))
             lastTime = time.time()
 

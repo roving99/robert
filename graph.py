@@ -1,5 +1,12 @@
 #!/usr/bin/python
-"""Draw graphs in pygame window."""
+"""Draw graphs in pygame window.
+
+^ y
+|
+|
++----> x
+
+"""
 
 import sys
 import pygame
@@ -32,8 +39,8 @@ class Graph(object):
         y = pos[1]
 #        px = x*self.scale+self.ox
 #        py = self.high-(y*self.scale+self.oy)
-        px = self.ox-y*self.scale
-        py = self.oy-x*self.scale
+        px = self.ox+x*self.scale
+        py = self.oy-y*self.scale
         return int(px), int(py)
 
     def mouseToGraph(self, pos):
@@ -104,8 +111,8 @@ if __name__=="__main__":
     print '=========+========='
     print
 
-    testX = (8,2,11,6,5,4,12,9,6,1)
-    testY = (3,10,3,6,8,12,1,4,9,14)
+    testX = (8,2,11,6,5,4,12,9,6,1, -10)
+    testY = (3,10,3,6,8,12,1,4,9,14, -5)
     print testX
     print testY
     print leastSquare( (testX, testY) ), 'should be (-1.1, 14.0)'
@@ -122,7 +129,7 @@ if __name__=="__main__":
     clock = pygame.time.Clock()
 
     displayZoom = 10
-    myGraph = Graph((400,400), origin=(100,100), scale=displayZoom)
+    myGraph = Graph((400,400), origin=(200,200), scale=displayZoom)
 
     while not done:
         for event in pygame.event.get():

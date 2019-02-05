@@ -35,7 +35,7 @@ def draw_cloud(gr, cloud):
         x = cloud[data][0]
         y = cloud[data][1]
         strength = cloud[data][2]
-        pos = (int(x), int(y))
+        pos = (-int(y), int(x))     # account for righthand rule frame of reference
         radius = 1
         gr.draw_circle(PURPLE, pos, radius) 
 
