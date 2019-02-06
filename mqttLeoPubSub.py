@@ -170,7 +170,7 @@ if __name__=="__main__":
     client.on_message = mqttOnMessage
     client.connect(HOSTNAME, 1883, 60)
 
-    md25Base = robotBase.RobotBase(30, 31.4159, 360)    # axle = 30cm(???), wheels 10cm diameter, 360 pulses per revolution
+    md25Base = robotBase.RobotBase(20.5, 31.4159, 360)    # axle = 30cm(???), wheels 10cm diameter, 360 pulses per revolution
     md25Base.reset()
 
     xTarget = None
