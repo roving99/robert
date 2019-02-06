@@ -94,8 +94,8 @@ def doTarget(payload):
     p.setTarget(payload[u'data'][0], payload[u'data'][1], payload[u'data'][2])
 
 def doPose(payload):
-    print 'doPose called'
-    print payload
+#    print 'doPose called'
+#    print payload
     p.setPose(payload[u'data'][0], payload[u'data'][1], payload[u'data'][2])
 
 
@@ -109,7 +109,7 @@ TOPICNAMES = [
 def mqttOnMessage(client, userdata, msg):
     topic = str(msg.topic)
     payload = str(msg.payload)
-    print 'received', topic, payload
+    #print 'received', topic, payload
     payload = json.loads(payload)
     for t in TOPICNAMES:
         if t[0]==topic:
@@ -144,6 +144,7 @@ if __name__=="__main__":
 
             data = {"time":time.time(), "type":"steering", "data":p.getSteering()}
             client.publish(topic='navigation/output/steering', payload=json.dumps(data))
+            print 'Steer: '+str(data['data'])
 
             data = {"time":time.time(), "type":"bearing", "data":p.getRelativeBearing()}
             client.publish(topic='navigation/output/bearing', payload=json.dumps(data))

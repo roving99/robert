@@ -3,7 +3,7 @@
 
 IAMAROBOT  = False
 
-if IAMAROBOT:
+if not IAMAROBOT:
 	MQTTIP = 'robert.local'
 
 else:

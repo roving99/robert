@@ -102,7 +102,7 @@ class MyPrompt(Cmd):
         y = int(s[1])
         t = int(s[2])
         print 'Set target ('+s[0]+', '+s[1]+', '+s[2]+')'
-        data = {"time":time.time(), "type":"target", "data":[0.0, 0.0, 0,0]} 
+        data = {"time":time.time(), "type":"target", "data":[x, y, t]} 
         client.publish(topic='navigation/input/target', payload=json.dumps(data))
         
 def mqttOnMessage(client, userdata, msg):
@@ -144,3 +144,4 @@ if __name__ == '__main__':
 
     print 'stopping mqtt client..'
     client.loop_stop()
+    
