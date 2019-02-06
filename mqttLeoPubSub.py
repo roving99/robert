@@ -37,6 +37,7 @@ FD - test signals, FE - echo args, FF help."
 '''
 
 #HOSTNAME = "localhost"
+HOSTNAME = config.MQTTIP
 
 def doSteer(payload):
     print 'doSteer called'
