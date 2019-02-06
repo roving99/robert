@@ -40,6 +40,16 @@ FD - test signals, FE - echo args, FF help."
 
 def doSteer(payload):
     print 'doSteer called'
+    print payload
+    t = payload[u'data'][0]     # cms-1
+    r = payload[u'data'][1]     # degrees s-1
+    r = 0.2*r                   # degrees to cm?
+    m1 = int(128+((t+r)/0.78125))    # convert cms-1 to power (0-255)
+    m2 = int(128+((t-r)/0.78125))
+    command = '03'+toHex(m1)+toHex(m2)
+    print command
+    print myLeo.send(command)
+    
     pass
 
 def doMotors(payload):
