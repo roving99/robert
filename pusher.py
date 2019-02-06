@@ -72,15 +72,15 @@ class Pusher(object):
         return (self.distance<acceptable)
 
     def getSteering(self):
-        acceptable = 5 # degrees
+        acceptable = 10 # degrees
         relative = self.getRelativeBearing()[1] # degrees
+        rate = 0.5*relative
         if self.areWeThereYet():
             return (0.0, 0.0) # cms-1, degrees-1 : stop
         if math.fabs(relative)<acceptable: # heading in the right direction?
-            return (10.0, 0.0) # cms-1, degrees-1 : move forward
+            return (20.0, relative/2.0) # cms-1, degrees-1 : move forward, making small rotational adjustments
         if relative>180:
             relative = -(360-relative)
-        rate = 0.5*relative
         if rate>20:
             rate = 20
         if rate<-20:
@@ -138,7 +138,7 @@ if __name__=="__main__":
     while running:
         client.loop()
 
-        if (time.time()-lastTime)>1.0:
+        if (time.time()-lastTime)>0.5:
             data = {"time":time.time(), "type":"target", "data":p.getTarget()}
             client.publish(topic='navigation/output/target', payload=json.dumps(data))
 

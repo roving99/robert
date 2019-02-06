@@ -205,7 +205,7 @@ ip = config.MQTTIP
 client.connect(ip, 1883, 60)
 client.loop_start()
 
-rows = 3
+rows = 2
 columns = 4     # big a display as the pi touchscreen will cope with.
 lastLidarUpdate=0
 
