@@ -12,7 +12,7 @@ def doNavigationOutputSteering(payload):
     print 'passing steering to drive/input/steer: '+str(payload)
     #data = {"time":time.time(), "type":"", "data":[1]} 
     data = payload # pass steering data unaltered.
-    client.publish(topic='drive/input/lidar', payload=json.dumps(data))
+    client.publish(topic='drive/input/steer', payload=json.dumps(data))
 
 def doNavigationInputTarget(payload):
     print 'New target pose set: '+str(payload)
