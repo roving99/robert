@@ -69,8 +69,11 @@ class Graph(object):
     def draw_line(self, colour, pos1, pos2, thickness):
         pygame.draw.line(self.surface, colour, self.dpos(pos1), self.dpos(pos2), thickness)
 
-    def draw_Line(self, colour, line, thickness):
-        pygame.draw.line(self.surface, colour, self.dpos((line.x1, line.y1)), self.dpos((line.x2, line.y2)), thickness)
+    def draw_Line(self, colour, line, thickness, rh=False):
+        if rh:
+            pygame.draw.line(self.surface, colour, self.dpos((-line.y1, line.x1)), self.dpos((-line.y2, line.x2)), thickness)
+        else:
+            pygame.draw.line(self.surface, colour, self.dpos((line.x1, line.y1)), self.dpos((line.x2, line.y2)), thickness)
 
     def maxX(self):
         return (self.wide-self.ox)/self.scale

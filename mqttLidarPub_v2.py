@@ -9,8 +9,10 @@ import os
 import importlib
 import json
 
+import config
+
 #MQTT_SERVER = "192.168.0.8"
-MQTT_SERVER = "127.0.0.1"
+#MQTT_SERVER = "127.0.0.1"
 
 TOPICNAME = "sense/output/lidar"
 
@@ -34,30 +36,26 @@ if __name__=="__main__":
     print '==========+========='
     print
 
-    if os.path.isfile("test/"+sys.argv[1]+'.py'):
-        updating = False
-        myNeato = None
-        test = importlib.import_module(sys.argv[1])
-        readings = test.data
-        print 'Using test data set '+sys.argv[1]
-        print 'data=',readings
+    if not config.IAMAROBOT:
+        print 'I am not a robot!'
+        sys.exit()
+
+    portname = config.LIDARTTY
+    updating = True
+    print 'Using data from LIDAR on port',portname
+    myNeato = neato.Neato(portname, 115200)
+    if myNeato.isOpen():
+        print 'Port opened.'
     else:
-        portname = sys.argv[1]
-        updating = True
-        print 'Using data from LIDAR on port',portname
-        myNeato = neato.Neato(portname, 115200)
-        if myNeato.isOpen():
-            print 'Port opened.'
-        else:
-            print 'ARSE'
-            sys.exit()
-        readings = myNeato.getScan()
+        print 'ARSE'
+        sys.exit()
+    readings = myNeato.getScan()
 
     client = mqtt.Client()
     client.on_connect = mqttOnConnect
     client.on_message = mqttOnMessage
 
-    client.connect(MQTT_SERVER, 1883, 60)
+    client.connect(config.MQTTIP, 1883, 60)
 
     print 'Publishing LIDAR data on',TOPICNAME
 

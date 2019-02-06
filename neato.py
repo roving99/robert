@@ -6,6 +6,8 @@ import math
 import select
 import serial
 
+import config
+
 class Neato():
     """
     Object to read output of Neato Lidar attached by serial.
@@ -246,7 +248,9 @@ def shiftCloud(cloud, delta):
     return result
     
 if __name__=="__main__":
-    portname = sys.argv[1]
+    
+    portname = config.LIDARTTY
+
     print 'NEATO HAckery v1.0'
     print '=================='
     print

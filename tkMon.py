@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import os
 import paho.mqtt.client as mqtt
 import time
@@ -6,6 +7,8 @@ import sys
 import math
 from Tkinter import *
         
+import config
+
 def doLidar(payload):
     global lastLidarUpdate
     lastLidarUpdate=lastLidarUpdate+1
@@ -196,16 +199,14 @@ cloudData= {0: (1167, 256), 1: (1162, 272), 2: (1156, 265), 3: (1152, 268), 4: (
 client = mqtt.Client()
 client.on_connect = mqttOnConnect
 client.on_message = mqttOnMessage
-ip = 'localhost'
-if len(sys.argv)>1:
-    ip = sys.argv[1]
-print "mqtt at "+ip
-client.connect(ip, 1883, 60)
 
+ip = config.MQTTIP
+
+client.connect(ip, 1883, 60)
 client.loop_start()
 
 rows = 3
-columns = 5
+columns = 4     # big a display as the pi touchscreen will cope with.
 lastLidarUpdate=0
 
 socket = {}

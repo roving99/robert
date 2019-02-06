@@ -11,6 +11,8 @@ import time
 import json
 import line
 
+import config
+
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GRAY = (64, 64, 64)
@@ -19,8 +21,9 @@ PURPLE = (255, 0, 255)
 RED = (255, 0, 0)
 PINK = (64, 0, 0)
 
+HOSTNAME  = config.MQTTIP
 #HOSTNAME = "robert.local"
-HOSTNAME = "127.0.0.1"
+#HOSTNAME = "127.0.0.1"
 TOPICNAME = "sense/output/lidar"
 
 def draw_background(gr):
@@ -35,7 +38,7 @@ def draw_cloud(gr, cloud):
         """
         Zero degrees = up. Theta is counterclockwise.
         """
-        pos = (int(x), int(y))
+        pos = (-int(y), int(x))
         radius = 1
         gr.draw_circle(GRAY, pos, radius) 
         if data>350 or data<10:
@@ -263,7 +266,7 @@ if __name__=="__main__":
             if showWalls:
                 for wall in allWalls:
                     #myGraph.draw_line_mb(PINK, m, b, 1)  # draw the extended wall
-                    myGraph.draw_Line(RED, wall, 2)  # draw the wall                    
+                    myGraph.draw_Line(RED, wall, 2, rh=True)  # draw the wall                    
 
         screen.blit(myGraph.surface, (0,0))
         pygame.display.flip()

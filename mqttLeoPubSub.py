@@ -8,6 +8,8 @@ import time
 import json
 import leo
 import robotBase
+
+import config
 '''
 drive/input/steer  {"data": [<translate>, <rotate>], } cms-1, degrees-1
 drive/input/motors {"data": [<motor left speed>, <motor right speed>], }   cms-1, cms-1
@@ -34,7 +36,7 @@ FD - test signals, FE - echo args, FF help."
 
 '''
 
-HOSTNAME = "localhost"
+#HOSTNAME = "localhost"
 
 def doSteer(payload):
     print 'doSteer called'
@@ -132,7 +134,11 @@ if __name__=="__main__":
     print '=====+====='
     print
 
-    portName = sys.argv[1]
+    if not config.IAMAROBOT:
+        print 'I am not a robot!'
+        sys.exit()
+        
+    portName = config.LEOTTY
     myLeo = leo.Leo(portName, 19200)
 
     if myLeo.isOpen():

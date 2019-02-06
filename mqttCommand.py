@@ -1,10 +1,12 @@
-import config
+#!/usr/bin/python
 from cmd import Cmd
 import os
 import paho.mqtt.client as mqtt
 import time
 import json
 import sys
+
+import config
 
 '''
 Command-line interface to MQTT client controlling robot.
@@ -93,6 +95,15 @@ class MyPrompt(Cmd):
         data = {"time":time.time(), "type":"pose", "data":[0.0, 0.0, 0,0]} 
         client.publish(topic='odometry/input/pose', payload=json.dumps(data))
 
+    def do_target(self, args):
+        """set a new target pose. <abs x> <abs y> <abs theta>."""
+        s = args.split()
+        x = int(s[0])
+        y = int(s[1])
+        t = int(s[2])
+        print 'Set target ('+s[0]+', '+s[1]+', '+s[2]+')'
+        data = {"time":time.time(), "type":"target", "data":[0.0, 0.0, 0,0]} 
+        client.publish(topic='navigation/input/target', payload=json.dumps(data))
         
 def mqttOnMessage(client, userdata, msg):
     topic = str(msg.topic)
@@ -111,26 +122,19 @@ def mqttOnConnect(client, userdata, flags, rc):  # added 'flags' on work version
         client.subscribe(t)
 
 if __name__ == '__main__':
-#    world = { 'ip': config.MQTTIP,
-#            }
-    world = { 'ip': 'robert.local',
-            }
-    
+
     client = mqtt.Client()
     client.on_connect = mqttOnConnect
     client.on_message = mqttOnMessage
-    ip = world['ip']
-    if len(sys.argv)>1:
-        ip = sys.argv[1]
-    print "mqtt at "+ip
+    
+    ip = config.MQTTIP
+
     client.connect(ip, 1883, 60)
-#    client.connect(world['ip'], 1883, 60)
+
     client.loop_start()
 
     print 'MQTT command'
     print '============'
-    for v in world.keys():
-        print v, ': ',world[v]
     print
     print'By your command!'
 

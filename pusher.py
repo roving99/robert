@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #pusher.
 # take current pose, and a target position (x,y) 
 
@@ -6,6 +7,8 @@ import math
 import paho.mqtt.client as mqtt
 import os
 import json
+
+import config
 
 class Pusher(object):
 
@@ -96,7 +99,7 @@ def doPose(payload):
     p.setPose(payload[u'data'][0], payload[u'data'][1], payload[u'data'][2])
 
 
-HOSTNAME = "localhost"
+HOSTNAME = config.MQTTIP
 # Subscribed topics :
 TOPICNAMES = [
     ['navigation/input/target', doTarget],

@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # Test 'pusher' maths..
 
 import pusher
