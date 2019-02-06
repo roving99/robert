@@ -105,6 +105,10 @@ class MyPrompt(Cmd):
         data = {"time":time.time(), "type":"target", "data":[x, y, t]} 
         client.publish(topic='navigation/input/target', payload=json.dumps(data))
         
+    def do_count(self, args):
+        print 'count: '+str(TOPICNAMES['drive/output/count']['data'])
+        print 'count: '+str(TOPICNAMES['odometry/output/pose']['data'])
+        
 def mqttOnMessage(client, userdata, msg):
     topic = str(msg.topic)
     payload = str(msg.payload)
@@ -144,4 +148,3 @@ if __name__ == '__main__':
 
     print 'stopping mqtt client..'
     client.loop_stop()
-    
