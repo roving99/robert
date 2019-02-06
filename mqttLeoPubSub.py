@@ -80,7 +80,7 @@ def doTarget(payload):
         xTarget = payload[u'data'][0]
         yTarget = payload[u'data'][1]
         thetaTarget = payload[u'data'][2]
-    else
+    else:
         xTarget=none
         yTarget=none
         thetaTarget=none
@@ -156,9 +156,9 @@ if __name__=="__main__":
     md25Base = robotBase.RobotBase(30, 31.4159, 360)    # axle = 30cm(???), wheels 10cm diameter, 360 pulses per revolution
     md25Base.reset()
 
-    xTarget = none
-    yTarget = none
-    thetaTarget = none
+    xTarget = None
+    yTarget = None
+    thetaTarget = None
 
     running = True
     while running:

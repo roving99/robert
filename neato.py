@@ -25,7 +25,7 @@ class Neato():
         self.portName = portName
         self.baud = baud
         self.port = None
-        self.offset = offset
+        self.offset = 0
         self.scan = {}
         self.cloud = {}
 
@@ -202,8 +202,8 @@ class Neato():
             angle = index # degrees
             distance = float(scan[index][0])
             strength = scan[index][1]
-            x = distance * math.cos(math.radians(angle))
-            y = distance * math.sin(math.radians(angle))
+            y = distance * math.cos(math.radians(angle))
+            x = distance * math.sin(math.radians(angle))
             cloud[index] = (x, y, strength)
         return cloud
 
