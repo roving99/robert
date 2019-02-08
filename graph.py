@@ -63,8 +63,11 @@ class Graph(object):
         self.draw_background()
         self.draw_axis()
 
-    def draw_circle(self, colour, pos, radius):
-        pygame.draw.circle(self.surface, colour, self.dpos(pos), radius)
+    def draw_circle(self, colour, pos, radius, rh=False):
+        if rh:
+            pygame.draw.circle(self.surface, colour, self.dpos((-pos[1],pos[0])), radius)
+        else:
+            pygame.draw.circle(self.surface, colour, self.dpos(pos), radius)
 
     def draw_line(self, colour, pos1, pos2, thickness):
         pygame.draw.line(self.surface, colour, self.dpos(pos1), self.dpos(pos2), thickness)

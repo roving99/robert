@@ -119,6 +119,19 @@ def bounds(data):
             minY=y[i]
     return (minX, minY), (maxX, maxY)
 
+def biggestGap(data):
+    '''
+    Return largest gap (mm) between points in line.
+    '''
+    x = data[0]
+    y = data[1]
+    ds = 0
+    for i in range (0, len(data[0])-1):
+        d = (x[i]-x[i+1])*(x[i]-x[i+1])+(y[i]-y[i+1])*(y[i]-y[i+1])
+        if d>ds:
+            ds = d
+    return math.sqrt(ds)
+            
 def splitXY(cloud, start, end):
     '''
     return seperate lists of x and y coords of cloud samples between given angles
@@ -142,37 +155,66 @@ def probableWall(cloud, start, end, d, f):
     m, b = leastSquare(data)
     if not m:
         return None, None   # No good line
+    if biggestGap(data)>100: #mm 
+        return None, None   # Too 'gappy'
     if percentageFit(data, m, b, d)<f:
         return None, None   # Too many points too far away from line.
     fit = percentageFit(data, m, b, d)
-    while fit>f and end<360:
+    done = False
+    while fit>f and end<360 and not done:
         end = end+1
         if end in cloud:
-            data[0].append(cloud[end][0])
-            data[1].append(cloud[end][1])
+            lastX = data[-1][0]
+            lastY = data[-1][1]
+            x = cloud[end][0]
+            y = cloud[end][1]
+            ds = (x-lastX)*(x-lastX)+(y-lastY)*(y-lastY) # distance^2 between last point in existing 'wall' and this pt.
+            if distance(x,y, m, b)<d:# and ds<100000:   # add next point only if it is within d of y=mx+b and 100mm of last pt.
+                data[0].append(x)
+                data[1].append(y)
+            else:
+                done = True
             #print fit, 'added point. Cloud length=', len(data[0])
         #print start, end
         fit = percentageFit(data, m, b, d, tail=3)
     return start, end
 
 def findWalls(cloud):
+    wallMinLength =150 #mm
     walls=[]
     wStart, wEnd = 0, 5     # Start looking at a 5degree section
     while wEnd<360:
-        start, end = probableWall(cloud, wStart, wEnd, 15, 85) # look for wall
+        start, end = probableWall(cloud, wStart, wEnd, 45, 85) # look for wall
         if start: # found a probable wall..
             m, b = leastSquare(splitXY(cloud, start,end)) # calculate gradient/intersection of wall
             pt1, pt2 = bounds(splitXY(cloud, start, end)) # NEED A BETTER WAY!    
             myLine = line.Line(pt1, pt2)
             if m<0:
                 myLine.flipX()
-            walls.append(myLine)
+            if myLine.length()>wallMinLength:
+                walls.append(myLine)
             wStart = start
             wEnd = end
         wStart = wEnd
         wEnd = wStart+5
     return walls
 
+def findCorners(allWalls):
+    '''
+    find corners (x,y) from a list of walls (line segments).
+    '''
+    acceptableAngle = 10 # degrees
+    acceptableDistance = 100 # mm
+    result = []
+    length=len(allWalls)
+    for i in range(0,length):
+        for j in range(0,length):
+            if not(i==j):
+                wall1 = allWalls[i]
+                wall2 = allWalls[j]
+                if math.fabs(wall1.angleTo(wall2)-90)<acceptableAngle and wall1.distance(wall2)<acceptableDistance:
+                    result.append(wall1.intersect(wall2))
+    return result
 
 def mqttOnMessage(client, userdata, msg):
     global cloud
@@ -253,7 +295,7 @@ if __name__=="__main__":
                     print 'Walls'
                     print '====='
                     for wall in allWalls:
-                        print wall.asText()
+                        print wall.asText(), wall.length()
                     print
                         
                 if event.key == pygame.K_q:
@@ -261,12 +303,15 @@ if __name__=="__main__":
         if cloud:
             draw_background(myGraph)
             allWalls = findWalls(cloud)
+            allCorners = findCorners(allWalls)
             if showCloud:
                 draw_cloud(myGraph, cloud)
             if showWalls:
                 for wall in allWalls:
                     #myGraph.draw_line_mb(PINK, m, b, 1)  # draw the extended wall
                     myGraph.draw_Line(RED, wall, 2, rh=True)  # draw the wall                    
+            for corner in allCorners:
+                myGraph.draw_circle(WHITE, corner, 5, rh=True)
 
         screen.blit(myGraph.surface, (0,0))
         pygame.display.flip()

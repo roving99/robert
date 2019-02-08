@@ -105,6 +105,19 @@ class Line(object):
 		line2 = Line((x,y), (x2,y2)) # line segment from origin to point
 		return self.intersect(line2) # intersection of orignal line and our calculated line.
 
+	def distance(self, l):
+		shortest = (self.x1-l.x1)*(self.x1-l.x1) + (self.y1-l.y1)*(self.y1-l.y1)
+		next = (self.x1-l.x2)*(self.x1-l.x2) + (self.y1-l.y2)*(self.y1-l.y2)
+		if next<shortest:
+			shortest=next
+		next = (self.x2-l.x2)*(self.x2-l.x2) + (self.y2-l.y2)*(self.y2-l.y2)
+		if next<shortest:
+			shortest=next
+		next = (self.x2-l.x1)*(self.x2-l.x1) + (self.y2-l.y1)*(self.y2-l.y1)
+		if next<shortest:
+			shortest=next
+		return math.sqrt(shortest)		
+
 	def asText(self):
 		'''As pair of points.'''
 		return 'line(('+str(self.x1)+', '+str(self.y1)+'),('+str(self.x2)+', '+str(self.y2)+'))'
@@ -144,6 +157,7 @@ if __name__=="__main__":
 		for line2 in lines:
 			print line.asText(), line2.asText(), 'parr:', line.parallelTo(line2), ' perp:', line.perpendicularTo(line2), 'pdist:', line.parallelDistance(line2), 'int:', line.intersect(line2)
 
+	print lines[0].distance(lines[1])
 
 	while not done:
 		for event in pygame.event.get():
