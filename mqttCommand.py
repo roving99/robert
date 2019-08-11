@@ -1,12 +1,9 @@
-#!/usr/bin/python
+import config
 from cmd import Cmd
 import os
 import paho.mqtt.client as mqtt
 import time
 import json
-import sys
-
-import config
 
 '''
 Command-line interface to MQTT client controlling robot.
@@ -52,18 +49,7 @@ class MyPrompt(Cmd):
         """Status of monitored topics"""
         global TOPICNAMES
         for k in TOPICNAMES.keys():
-            if TOPICNAMES[k]:
-                print k,': ',TOPICNAMES[k]['data']
-
-    def do_lidaron(self, args):
-        """switch lidar motor ON"""
-        data = {"time":time.time(), "type":"", "data":[1]} 
-        client.publish(topic='drive/input/lidar', payload=json.dumps(data))
-        
-    def do_lidaroff(self, args):
-        """switch lidar motor OFF"""
-        data = {"time":time.time(), "type":"", "data":[0]} 
-        client.publish(topic='drive/input/lidar', payload=json.dumps(data))
+            print k,': ',TOPICNAMES[k]
 
     def do_forward(self, args):
         """go forward at 10cms-1"""
@@ -95,19 +81,6 @@ class MyPrompt(Cmd):
         data = {"time":time.time(), "type":"pose", "data":[0.0, 0.0, 0,0]} 
         client.publish(topic='odometry/input/pose', payload=json.dumps(data))
 
-    def do_target(self, args):
-        """set a new target pose. <abs x> <abs y> <abs theta>."""
-        s = args.split()
-        x = int(s[0])
-        y = int(s[1])
-        t = int(s[2])
-        print 'Set target ('+s[0]+', '+s[1]+', '+s[2]+')'
-        data = {"time":time.time(), "type":"target", "data":[x, y, t]} 
-        client.publish(topic='navigation/input/target', payload=json.dumps(data))
-        
-    def do_count(self, args):
-        print 'count: '+str(TOPICNAMES['drive/output/count']['data'])
-        print 'count: '+str(TOPICNAMES['odometry/output/pose']['data'])
         
 def mqttOnMessage(client, userdata, msg):
     topic = str(msg.topic)
@@ -116,7 +89,6 @@ def mqttOnMessage(client, userdata, msg):
     payload = json.loads(payload)
     for t in TOPICNAMES.keys():
         if t==topic:
-            #print 'updated '+topic
             TOPICNAMES[t]= payload
 
 def mqttOnConnect(client, userdata, flags, rc):  # added 'flags' on work version of library?
@@ -126,19 +98,21 @@ def mqttOnConnect(client, userdata, flags, rc):  # added 'flags' on work version
         client.subscribe(t)
 
 if __name__ == '__main__':
-
+#    world = { 'ip': config.MQTTIP,
+#            }
+    world = { 'ip': 'robert.local',
+            }
+    
     client = mqtt.Client()
     client.on_connect = mqttOnConnect
     client.on_message = mqttOnMessage
-    
-    ip = config.MQTTIP
-
-    client.connect(ip, 1883, 60)
-
+    client.connect(world['ip'], 1883, 60)
     client.loop_start()
 
     print 'MQTT command'
     print '============'
+    for v in world.keys():
+        print v, ': ',world[v]
     print
     print'By your command!'
 
