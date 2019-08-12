@@ -12,7 +12,7 @@ import config
 def doLidar(payload):
     global lastLidarUpdate
     lastLidarUpdate=lastLidarUpdate+1
-    if lastLidarUpdate>5: # limit rate of updates to 2Hz.
+    if lastLidarUpdate>1: # limit rate of updates to 2Hz.
         uCloud = payload['data'] # unicode keys
         cloud = {}
         for key in uCloud.keys(): # json converts int keys to unicode. change back to ints..

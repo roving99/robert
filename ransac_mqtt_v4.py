@@ -37,8 +37,8 @@ def draw_lidar(gr, readings):
         gr.draw_circle(GREEN, pos, radius) 
         gr.draw_line(GRAY, (0, 0), pos, 1)
 #        if data==180 or data==160:
-        if data>=startAngle and data<=endAngle:
-            gr.draw_line(WHITE, (0, 0), pos, 1)
+#        if data>=startAngle and data<=endAngle:
+#           gr.draw_line(WHITE, (0, 0), pos, 1)
             
 def draw_cloud(gr, cloud):
     for data in cloud.keys():

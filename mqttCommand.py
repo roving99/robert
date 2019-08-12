@@ -81,6 +81,26 @@ class MyPrompt(Cmd):
         data = {"time":time.time(), "type":"pose", "data":[0.0, 0.0, 0,0]} 
         client.publish(topic='odometry/input/pose', payload=json.dumps(data))
 
+    def do_lidaron(self, args):
+        """switch lidar motor ON"""
+        data = {"time":time.time(), "type":"", "data":[1]} 
+        client.publish(topic='drive/input/lidar', payload=json.dumps(data))
+
+    def do_lidaroff(self, args):
+         """switch lidar motor OFF"""
+         data = {"time":time.time(), "type":"", "data":[0]} 
+         client.publish(topic='drive/input/lidar', payload=json.dumps(data))
+
+    def do_target(self, args):
+        """set a new target pose. <abs x> <abs y> <abs theta>."""
+        s = args.split()
+        x = int(s[0])
+        y = int(s[1])
+        t = int(s[2])
+        print 'Set target ('+s[0]+', '+s[1]+', '+s[2]+')'
+        data = {"time":time.time(), "type":"target", "data":[x, y, t]} 
+        client.publish(topic='navigation/input/target', payload=json.dumps(data))
+
         
 def mqttOnMessage(client, userdata, msg):
     topic = str(msg.topic)
