@@ -1,10 +1,19 @@
 #!/usr/bin/python
 """Draw graphs in pygame window.
+'regular' axis =
 
 ^ y
 |
 |
 +----> x
+
+'robot' axis =
+
+    ^ x 
+    |
+    |
+y<--+
+
 
 """
 
@@ -23,24 +32,39 @@ RED = (255, 0, 0)
 
 
 class Graph(object):
-    def __init__(self, size, origin=(10,10), scale =1.0):
+    def __init__(self, size, origin=(10,10), scale =1.0, robot=False):
         self.high = size[1] # pix
         self.wide = size[0] # pix
         self.ox = origin[0] # pix
         self.oy = origin[1] # pix
         self.scale = scale 
         self.surface = pygame.Surface((self.wide, self.high))
+        self.robot = robot  # 'regular' axis.
+
+    def zoom(self, scale):
+        self.scale = scale 
 
     def dpos(self, pos):
         '''
         return position in pixels on surface
+
+        'pygame' axis =
+        +----> x
+        |
+        |
+        v y
+
         '''
         x = pos[0]
         y = pos[1]
 #        px = x*self.scale+self.ox
 #        py = self.high-(y*self.scale+self.oy)
-        px = self.ox+x*self.scale
-        py = self.oy-y*self.scale
+        if self.robot:
+            px = self.ox-y*self.scale
+            py = self.oy-x*self.scale
+        else:
+            px = self.ox+x*self.scale
+            py = self.oy-y*self.scale
         return int(px), int(py)
 
     def mouseToGraph(self, pos):
@@ -53,7 +77,7 @@ class Graph(object):
 
     def draw_axis(self):
         pygame.draw.line(self.surface, GRAY, self.dpos((-20000,0)), self.dpos((20000,0)), 1)
-        pygame.draw.line(self.surface, WHITE, self.dpos((0,-20000)), self.dpos((0,20000)), 1)
+        pygame.draw.line(self.surface, GRAY, self.dpos((0,-20000)), self.dpos((0,20000)), 1)
         #pygame.draw.circle(self.surface, WHITE, self.dpos((0,0)), 10)
 
     def draw_background(self):

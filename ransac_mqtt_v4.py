@@ -32,6 +32,7 @@ def draw_lidar(gr, readings):
         angle = math.radians(data)
         distance = readings[data][0]
         strength = readings[data][1]
+#        pos = (int(math.cos(angle)*distance), int(math.sin(angle)*distance)) 
         pos = (int(math.sin(angle)*distance), int(math.cos(angle)*distance)) 
         radius = 1
         gr.draw_circle(GREEN, pos, radius) 
@@ -46,6 +47,7 @@ def draw_cloud(gr, cloud):
         y = cloud[data][1]
         strength = cloud[data][2]
         pos = (int(x), int(y))
+#        pos = (int(y), int(x))
         radius = 1
         gr.draw_circle(PURPLE, pos, radius) 
         if wStart:
@@ -83,6 +85,28 @@ def leastSquare(data):
     m = top/bottom
     b = meanY - m*meanX
     return m, b
+
+def spread(data): 
+    '''
+    Average distance between points
+    '''
+    x = data[0]
+    y = data[1]
+    n = len(x)
+    total = 0.0
+    for i in range(1,n):
+        dx = x[i]-x[i-1]
+        dy = y[i]-y[i-1]
+        total = total + math.sqrt(dx*dx + dy*dy)
+    return total/n
+
+def pointDistance(p1, p2):
+    '''
+    distance between two points
+    '''
+    dx = p2[0]-p1[0]
+    dy = p2[1]-p1[1]
+    return math.sqrt(dx*dx + dy*dy)
 
 def distance(x, y, m , b):
     '''
@@ -132,21 +156,37 @@ def probableWall(cloud, start, end, d, f):
     does cloud between start and end look like a wall (f percent of points within d of least square line)?
     If so, extend angles as points remain in d of y=mx+b
     '''
+
     data = splitXY(cloud, start, end)
     m, b = leastSquare(data)
+
     if not m:
         return None, None   # No good line
-    if percentageFit(data, m, b, d)<f:
-        return None, None   # Too many points too far away from line.
+
+    if len(data[0])<2:
+        return None, None   # Too few points to make a reasonable guess
+
     fit = percentageFit(data, m, b, d)
+    aveDistance = spread(data)      # average distance between points.
+
+#    if aveDistance>50.0:            # points are too spread out for a good match
+#        return None, None
+
+    if fit<f:
+        return None, None   # Too many points too far away from line in first sample.
+
     while fit>f and end<360:
         end = end+1
         if end in cloud:
+            lastPoint = (data[0][-1:][0], data[1][-1:][0])
+            newPoint = (cloud[end][0], cloud[end][1])
+            if pointDistance(lastPoint, newPoint)>aveDistance*3.0:
+                return start, end-1                     # if next point is toooo far away, exit
             data[0].append(cloud[end][0])
             data[1].append(cloud[end][1])
-            #print fit, 'added point. Cloud length=', len(data[0])
-        #print start, end
-        fit = percentageFit(data, m, b, d, tail=3)
+            aveDistance = spread(data)
+            fit = percentageFit(data, m, b, d, tail=3)
+
     return start, end
 
 def splitXY(cloud, start, end):
@@ -197,7 +237,7 @@ if __name__=="__main__":
     client.loop_start()
 
     pygame.init()
-    size = (400,400)
+    size = (1000,1000)
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('RANSAC/MQTT hackery')
 
@@ -215,7 +255,7 @@ if __name__=="__main__":
     showCloud = True
     showWalls = True
 
-    myGraph = graph.Graph((400, 400), origin=(200,200), scale=displayZoom)
+    myGraph = graph.Graph((1000, 1000), origin=(500,500), scale=displayZoom, robot=True)
 
     while not done:
         for event in pygame.event.get():
@@ -236,12 +276,13 @@ if __name__=="__main__":
                 if event.key == pygame.K_q:
                     done = True 
         if cloud:
+            print len(cloud)
             draw_background(myGraph)
 #            draw_lidar(myGraph, readings)
             if showCloud:
                 draw_cloud(myGraph, cloud)
 
-            wStart, wEnd = 0, 5
+            wStart, wEnd = 0, 20
             while wEnd<360:
                 start, end = probableWall(cloud, wStart, wEnd, 15, 85) # look for wall
                 if start: # found a wall..
@@ -251,12 +292,14 @@ if __name__=="__main__":
                     if m<0:
                         myLine.flipX()
                     if showWalls:
-                        myGraph.draw_line_mb(PINK, m, b, 1)  # draw the extended wall
+#                        myGraph.draw_line_mb(PINK, m, b, 1)  # draw the extended wall
                         myGraph.draw_Line(RED, myLine, 2)  # draw the wall                    
                     wStart = start
                     wEnd = end
                 wStart = wEnd
                 wEnd = wStart+5
+
+        myGraph.draw_circle(WHITE,(0,0), 10)
 
         screen.blit(myGraph.surface, (0,0))
         pygame.display.flip()
