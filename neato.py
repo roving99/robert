@@ -229,7 +229,7 @@ def toCloud(scan):
 def prune(readings):    # remove erroneous readings from scan data
     keys = readings.keys()
     for key in keys:
-        if readings[key][0]>16000 or readings[key][0]<10 or (int(key)>8 and int(key)<42):   # ALSO prunes shadow of robot body (tower)!
+        if readings[key][0]>16000 or readings[key][0]<10: # or (int(key)>8 and int(key)<42):   # ALSO prunes shadow of robot body (tower)!
             del readings[key]
     return readings
 

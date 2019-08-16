@@ -106,6 +106,9 @@ class Line(object):
 		return self.intersect(line2) # intersection of orignal line and our calculated line.
 
 	def distance(self, l):
+		'''
+		Shortest distance between endpoints of two lines
+		'''
 		shortest = (self.x1-l.x1)*(self.x1-l.x1) + (self.y1-l.y1)*(self.y1-l.y1)
 		next = (self.x1-l.x2)*(self.x1-l.x2) + (self.y1-l.y2)*(self.y1-l.y2)
 		if next<shortest:
@@ -142,7 +145,6 @@ if __name__=="__main__":
 	pygame.init()
 	clock = pygame.time.Clock()
 
-	size = (600,600)
 	screen = pygame.display.set_mode(size)
 	pygame.display.set_caption('Line class')
 	displayZoom = 10
