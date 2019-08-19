@@ -19,6 +19,20 @@ RED = (255, 0, 0)
 PINK = (64, 0, 0)
 BLUE = (0,0,255)
 
+def trafficLight(percent):
+    '''
+    return a colour triple from GREEN (0) to RED (100) via YELLOW (50).
+    '''
+    r = int((percent/100.0)*512)
+    if (r>255): 
+        r=255
+    g = int(((100-percent)/100.0)*512)
+    if (g>255): 
+        g=255
+    b = 0
+
+    return (r, g, b)
+
 def draw_background(gr):
     gr.draw_background()
             
