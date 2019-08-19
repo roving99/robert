@@ -95,6 +95,21 @@ def CofG(data):
     return tx/n, ty/n
 
 
+def CofF(data):
+    '''
+    Centre of 'force' (inversely proportional to square of distance) of the cloud data.
+    '''
+    x = data[0]
+    y = data[1]
+    n = len(x)
+    tx = 0.0
+    ty = 0.0
+    for i in range(0,n):
+        r = (x[i]*x[i]+y[i]*y[i])
+        tx+=r*x[i]
+        ty+=r*y[i]
+    return tx/n, ty/n
+
 def pointDistance(p1, p2):
     '''
     distance between two points
@@ -159,7 +174,7 @@ def probableWall(cloud, start, end, d, f):
     if not m:
         return None, None   # No good line
 
-    if len(data[0])<2:
+    if len(data[0])<3:
         return None, None   # Too few points to make a reasonable guess
 
     fit = percentageFit(data, m, b, d)
@@ -173,7 +188,7 @@ def probableWall(cloud, start, end, d, f):
         if end in cloud:
             lastPoint = (data[0][-1:][0], data[1][-1:][0])
             newPoint = (cloud[end][0], cloud[end][1])
-            if pointDistance(lastPoint, newPoint)>aveDistance*3.0:
+            if pointDistance(lastPoint, newPoint)>aveDistance*4.0:
                 return start, end-1                     # if next point is toooo far away, exit
             data[0].append(cloud[end][0])
             data[1].append(cloud[end][1])
@@ -219,6 +234,7 @@ def findWalls(cloud, startAngle, endAngle):
                 myPt2 = longLine.closestPoint(pt2[0], pt2[1])
             myLine = line.Line(myPt1, myPt2)
 
+#            if (len(XY[0])>4):
             walls.append(myLine)
 
             wStart = start
@@ -317,6 +333,7 @@ if __name__=="__main__":
             longWalls = pruneByLength(walls,200)
             corners = findCorners(walls)
             cofg = CofG(splitXY(cloud,0,360))
+            coff = CofF(splitXY(cloud,0,360))
 #            print 'walls:', len(walls), '  corners:', len(corners)
             if showWalls:
                 for wall in walls:
@@ -325,7 +342,9 @@ if __name__=="__main__":
                     myGraph.draw_Line(GREEN, wall, 2)  # draw the wall                    
             for corner in corners:
                 myGraph.draw_circle(BLUE, corner, 4)
-            myGraph.draw_circle(GRAY, corner, 10) 
+        
+        myGraph.draw_circle(GRAY, cofg, 10) 
+        myGraph.draw_circle(RED, coff, 10) 
 
         myGraph.draw_circle(WHITE,(0,0), 10)
 
