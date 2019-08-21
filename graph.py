@@ -93,6 +93,9 @@ class Graph(object):
         else:
             pygame.draw.circle(self.surface, colour, self.dpos(pos), radius)
 
+    def draw_empty_circle(self, colour, pos, radius, thickness):
+        pygame.draw.circle(self.surface, colour, self.dpos(pos), radius, thickness)
+
     def draw_line(self, colour, pos1, pos2, thickness):
         pygame.draw.line(self.surface, colour, self.dpos(pos1), self.dpos(pos2), thickness)
 

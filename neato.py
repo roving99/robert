@@ -213,7 +213,7 @@ class Neato():
 
 def toCloud(scan):
     """
-    Calculate point (x, y, theta) cloud from a scan hash.
+    Calculate point (x, y, distance) cloud from a scan hash.
     x is forward of Robert.
     y is leftward.
     theta is counterclockwise.
@@ -225,7 +225,7 @@ def toCloud(scan):
         strength = scan[index][1]
         x = int(distance * math.cos(math.radians(angle)))
         y = int(distance * math.sin(math.radians(angle)))
-        cloud[index] = (x, y, strength)
+        cloud[index] = (x, y, distance)
     return cloud
 
 def prune(readings):    # remove erroneous readings from scan data

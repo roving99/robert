@@ -26,38 +26,7 @@ HOSTNAME = "robert.local"
 #HOSTNAME = "192.168.0.10"
 TOPICNAME = "sense/output/lidar"
 
-def draw_background(gr):
-    gr.draw_background()
 
-def draw_lidar(gr, readings):
-    for data in readings.keys():
-        angle = math.radians(data)
-        distance = readings[data][0]
-        strength = readings[data][1]
-#        pos = (int(math.cos(angle)*distance), int(math.sin(angle)*distance)) 
-        pos = (int(math.sin(angle)*distance), int(math.cos(angle)*distance)) 
-        radius = 1
-        gr.draw_circle(GREEN, pos, radius) 
-        gr.draw_line(GRAY, (0, 0), pos, 1)
-#        if data==180 or data==160:
-#        if data>=startAngle and data<=endAngle:
-#           gr.draw_line(WHITE, (0, 0), pos, 1)
-            
-def draw_cloud(gr, cloud):
-    for data in cloud.keys():
-        x = cloud[data][0]
-        y = cloud[data][1]
-        strength = cloud[data][2]
-        pos = (int(x), int(y))
-#        pos = (int(y), int(x))
-        radius = 1
-        gr.draw_circle(PURPLE, pos, radius) 
-        if wStart:
-            if data>=wStart and data<=wEnd:
-                gr.draw_line(RED, (0, 0), pos, 1)
-        if data>=startAngle and data<=endAngle:
-            gr.draw_line(WHITE, (0, 0), pos, 1)
-            
 def mqttOnMessage(client, userdata, msg):
     global cloud
   #  print 'received', str(msg.topic), str(msg.payload)
@@ -132,25 +101,33 @@ if __name__=="__main__":
                 if event.key == pygame.K_q:
                     done = True 
         if cloud:
-            draw_background(myGraph)
+            clouds.draw_background(myGraph)
             if showCloud:
-                draw_cloud(myGraph, cloud)
+                clouds.draw_cloud(myGraph, cloud)
 
             walls = clouds.findWalls(cloud, startAngle,endAngle)                     
             longWalls = clouds.pruneByLength(walls,200)
             corners = clouds.findCorners(walls)
             cofg = clouds.CofG(clouds.splitXY(cloud,0,360))
+            coff = clouds.CofF(clouds.splitXY(cloud,0,360))
+            force = clouds.forcePush(cloud)
+            print force
+            forceResultant = clouds.CofG(clouds.splitXY(force,0,360))
             if showWalls:
                 for wall in walls:
                     myGraph.draw_Line(RED, wall, 1)  # draw the wall                    
                 for wall in longWalls:
                     myGraph.draw_Line(GREEN, wall, 2)  # draw the wall                    
-                for corner in corners:
-                    myGraph.draw_circle(BLUE, corner, 4)
+            for corner in corners:
+                myGraph.draw_circle(BLUE, corner, 4)
+            clouds.draw_force(myGraph, force)
 
-            myGraph.draw_circle(GRAY, cofg, 10) 
+            myGraph.draw_circle(GRAY, cofg, 10)     # centre of point cloud.
 
-        myGraph.draw_circle(WHITE,(0,0), 10)
+            myGraph.draw_circle(RED, (forceResultant[0]*100, forceResultant[1]*100), 10)  # 'push' from obsticles.
+
+        myGraph.draw_circle(WHITE,(0,0), int(150*displayZoom))  # Robert (approx 30cm diameter)
+        myGraph.draw_empty_circle(GRAY, (0, 0), int(2000*displayZoom), 1)   # Force zone
 
         screen.blit(myGraph.surface, (0,0))
         pygame.display.flip()

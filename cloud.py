@@ -17,12 +17,17 @@ GREEN = (0, 255, 0)
 PURPLE = (255, 0, 255)
 RED = (255, 0, 0)
 PINK = (64, 0, 0)
-BLUE = (0,0,255)
+BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
 
 def trafficLight(percent):
     '''
     return a colour triple from GREEN (0) to RED (100) via YELLOW (50).
     '''
+    if percent<0.0:
+        percent = 0.0
+    if percent>100:
+        percent=100
     r = int((percent/100.0)*512)
     if (r>255): 
         r=255
@@ -33,23 +38,41 @@ def trafficLight(percent):
 
     return (r, g, b)
 
+def forcePush(cloud):
+    '''
+    Calculate force pushing from nearby (<2m away) objects.
+    force is inversely proportional to square of distance from robot.
+    '''
+    result = {}
+    for angle in cloud.keys():
+        range = cloud[angle][2]
+        if range<2000:
+            x = -cloud[angle][0]/range
+            y = -cloud[angle][1]/range  # direction in which force acts (normalized)
+            force = ((2000-range)*(2000-range))/40000   # force scaled to 0-100
+            result[angle] = (x*force, y*force, force)
+    return result
+
 def draw_background(gr):
     gr.draw_background()
-            
+
+def draw_force(gr, cloud):
+    for data in cloud.keys():
+        x = cloud[data][0]*20   # expanded to aid visibility
+        y = cloud[data][1]*20   # scaled to 100% = 2000mm
+        force = cloud[data][2]  # 0-100
+        pos = (int(x), int(y))
+        radius = 1
+        gr.draw_circle(trafficLight(force), pos, radius) 
+        
 def draw_cloud(gr, cloud):
     for data in cloud.keys():
         x = cloud[data][0]
         y = cloud[data][1]
         strength = cloud[data][2]
         pos = (int(x), int(y))
-#        pos = (int(y), int(x))
         radius = 2
         gr.draw_circle(PURPLE, pos, radius) 
-        if wStart:
-            if data>=wStart and data<=wEnd:
-                gr.draw_line(RED, (0, 0), pos, 1)
-        if data>=startAngle and data<=endAngle:
-            gr.draw_line(WHITE, (0, 0), pos, 1)
             
 def prune(readings):    # remove erroneous readings from scan data
     keys = readings.keys()
@@ -239,16 +262,13 @@ def findWalls(cloud, startAngle, endAngle):
             longLine = line.Line(pt1, pt2) # long line best fit to data
 
             pt1, pt2 = bounds(XY) 
-            # gradient of line between corners of the bound rectangle is always positive
-            if m<0.0: # gradient is reversed
+            if m<0.0: # gradient is reversed # gradient of line between corners of the bound rectangle is always positive
                 myPt1 = longLine.closestPoint(pt2[0], pt1[1])
                 myPt2 = longLine.closestPoint(pt1[0], pt2[1])
             else:
                 myPt1 = longLine.closestPoint(pt1[0], pt1[1])
                 myPt2 = longLine.closestPoint(pt2[0], pt2[1])
             myLine = line.Line(myPt1, myPt2)
-
-#            if (len(XY[0])>4):
             walls.append(myLine)
 
             wStart = start
@@ -292,6 +312,8 @@ if __name__=="__main__":
     print 'Cloud:'
     print 'length:', len(cloud)
     print cloud 
+    print 'Force:'
+    print forcePush(cloud) 
 
     pygame.init()
     size = (1000,1000)
@@ -348,6 +370,8 @@ if __name__=="__main__":
             corners = findCorners(walls)
             cofg = CofG(splitXY(cloud,0,360))
             coff = CofF(splitXY(cloud,0,360))
+            force = forcePush(cloud)
+            forceResultant = CofG(splitXY(force,0,360))
 #            print 'walls:', len(walls), '  corners:', len(corners)
             if showWalls:
                 for wall in walls:
@@ -355,12 +379,14 @@ if __name__=="__main__":
                 for wall in longWalls:
                     myGraph.draw_Line(GREEN, wall, 2)  # draw the wall                    
             for corner in corners:
-                myGraph.draw_circle(BLUE, corner, 4)
+                myGraph.draw_circle(BLUE, corner, 4)    # draw corners
+            draw_force(myGraph, force)
         
-        myGraph.draw_circle(GRAY, cofg, 10) 
-        myGraph.draw_circle(RED, coff, 10) 
+        myGraph.draw_circle(GRAY, cofg, 10)     # centre of point cloud.
+        myGraph.draw_circle(RED, (forceResultant[0]*100, forceResultant[1]*100), 10)  # 'push' from obsticles.
 
-        myGraph.draw_circle(WHITE,(0,0), 10)
+        myGraph.draw_circle(WHITE,(0,0), int(150*displayZoom))  # Robert (approx 30cm diameter)
+        myGraph.draw_empty_circle(GRAY, (0, 0), int(2000*displayZoom), 1)   # Force zone
 
         screen.blit(myGraph.surface, (0,0))
         pygame.display.flip()
