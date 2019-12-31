@@ -185,7 +185,7 @@ class Cloud(Frame, object):
                 x = self.data[angle][0]/20
                 y = self.data[angle][1]/20
                 #self.canvas.create_line(100,100, 100-x, 100-y, tags='data', fill='#888')
-                self.canvas.create_rectangle(100-y, 100-x, 101-y, 101-x, fill='#800', outline='#800', tags='data')
+                self.canvas.create_rectangle(100-y, 100-x, 101-y, 101-x, fill='#888', outline='#888', tags='data')
 
     def drawBackground(self):
         self.backgroundID=self.canvas.create_rectangle(0,0,200,200, fill='#111')
