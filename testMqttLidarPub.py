@@ -13,9 +13,10 @@ sys.path.append(r'..')
 
 import neato
 import graph
+import config
 
 #MQTT_SERVER = "192.168.0.8"
-MQTT_SERVER = "127.0.0.1"
+MQTT_SERVER = config.MQTTIP
 
 TOPICNAME = "sense/output/lidar"
 
@@ -38,19 +39,11 @@ def draw_cloud(gr, cloud):
         radius = 1
         gr.draw_circle(PURPLE, pos, radius) 
 
-def prune(readings):    # remove erroneous readings from scan data
-    keys = readings.keys()
-    for key in keys:
-        if readings[key][0]>16000 or readings[key][0]<10 or (int(key)>8 and int(key)<55): # remove robot body shadow (10-40degrees) also.
-            del readings[key]
-    return readings
-
 def mqttOnConnect(client, userdata, rc, tmp):
     print("Connected with result code "+str(rc))
 
 def mqttOnMessage(client, userdata, msg):
     print 'received', str(msg.topic), str(msg.payload)
-
 
 if __name__=="__main__":
     print 'TEST LIDAR MQTT Publisher'
@@ -77,7 +70,7 @@ if __name__=="__main__":
     pygame.init()
     size = (400,400)
     screen = pygame.display.set_mode(size)
-    pygame.display.set_caption('LIDAR data on '+TOPICNAME)
+    pygame.display.set_caption('test LIDAR data on '+TOPICNAME)
 
     done = False
     clock = pygame.time.Clock()
@@ -114,12 +107,6 @@ if __name__=="__main__":
                 if event.key == pygame.K_q:
                     done = True 
 
-        if updating:
-            readings = myNeato.getScan()
-            rpm = myNeato.getRPM()
-            prune(readings)
-            cloud = neato.toCloud(readings)
-        
         draw_background(myGraph)
         draw_cloud(myGraph, cloud)
 
@@ -129,6 +116,6 @@ if __name__=="__main__":
         data = {"time":time.time(), "type":"lidar", "data":cloud}
         client.publish(topic=TOPICNAME, payload=json.dumps(data))
 
-        clock.tick(10)  # limit to 10 fps (plenty fast enough)
+        clock.tick(5)  # limit to 10 fps (plenty fast enough)
 
     pygame.quit()

@@ -11,6 +11,7 @@ import time
 import json
 import line
 import cloud as clouds 
+import config
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -21,9 +22,7 @@ RED = (255, 0, 0)
 PINK = (64, 0, 0)
 BLUE = (0, 0, 255)
 
-HOSTNAME = "localhost"
-HOSTNAME = "robert.local"
-#HOSTNAME = "192.168.0.10"
+HOSTNAME = config.MQTTIP
 TOPICNAME = "sense/output/lidar"
 
 
