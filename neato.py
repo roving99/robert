@@ -246,7 +246,7 @@ def shiftCloud(cloud, delta):
     result={}
     for key in cloud.keys():
         result[key]=cloud[key]
-        result[key]=(result[key][0]+delta,)+result[key][1:]  # neet way to change a value in a tuple!
+        result[key]=(result[key][0]+delta,)+result[key][1:]  # neat way to change a value in a tuple!
     return result
     
 if __name__=="__main__":

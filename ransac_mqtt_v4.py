@@ -11,6 +11,7 @@ import time
 import json
 import line
 import cloud as clouds 
+import config
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -21,9 +22,7 @@ RED = (255, 0, 0)
 PINK = (64, 0, 0)
 BLUE = (0, 0, 255)
 
-HOSTNAME = "localhost"
-HOSTNAME = "robert.local"
-#HOSTNAME = "192.168.0.10"
+HOSTNAME = config.MQTTIP
 TOPICNAME = "sense/output/lidar"
 
 
@@ -111,7 +110,6 @@ if __name__=="__main__":
             cofg = clouds.CofG(clouds.splitXY(cloud,0,360))
             coff = clouds.CofF(clouds.splitXY(cloud,0,360))
             force = clouds.forcePush(cloud)
-            print force
             forceResultant = clouds.CofG(clouds.splitXY(force,0,360))
             if showWalls:
                 for wall in walls:
@@ -132,7 +130,7 @@ if __name__=="__main__":
         screen.blit(myGraph.surface, (0,0))
         pygame.display.flip()
 
-        clock.tick(5)  # limit to 10 fps (plenty fast enough)
+        clock.tick(10)  # limit to 10 fps (plenty fast enough)
 
     client.loop_stop()
     pygame.quit()

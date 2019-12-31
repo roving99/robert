@@ -21,6 +21,13 @@ def doLidar(payload):
         cloud1.setData(cloud)
         lastLidarUpdate=0
 
+def doForce(payload):
+    uCloud = payload['data'] # unicode keys
+    cloud = {}
+    for key in uCloud.keys(): # json converts int keys to unicode. change back to ints..
+        cloud[int(key)]=uCloud[key]
+    cloud2.setData(cloud)
+
 def doTarget(payload):
     poseTarget.setData(payload['data'])
 
@@ -39,6 +46,7 @@ TOPICNAMES = {  'drive/output/battery':doBattery,
                 'drive/output/count':None,
                 'odometry/output/pose':doPose,
                 'sense/output/lidar':doLidar,
+                'ransac/output/force':doForce,
                 'navigation/output/target':doTarget,
                 'navigation/output/bearing':doBearing,
                 'navigation/output/stearing':None,
@@ -125,45 +133,11 @@ class Pose(Frame, object):
         s = l
         self.canvas.coords(self.arrowID, 100-l*math.sin(a),100-l*math.cos(a), 100-s*math.sin(a+b), 100-s*math.cos(a+b), 100-s*math.sin(a-b), 100-s*math.cos(a-b))    
 
-class Scan(Frame, object):
-    def __init__(self,master, label, data):
-        Frame.__init__(self, master)
-        self.master = master
-        self.data = data # [x,y,theta]
-        self.text = label
-        self.canvas = Canvas(self, width=200, height=200, bd=0)
-        self.title = "Scan"
-        self.label = Label
-        self.canvas.pack()
-        self.draw()
-        self.setData(self.data)
-        self.pack()
-
-    def draw(self):
-        self.drawBackground()
-        self.drawData()
-
-    def drawData(self):
-        self.canvas.delete('data')
-        self.canvas.create_text(100,10,fill="#888",font="Helvetica", text=self.text, width=200, tags='data')
-        for angle in self.data.keys():
-            x = 100-math.sin(math.radians(angle))*(self.data[angle][0]/20)
-            y = 100-math.cos(math.radians(angle))*(self.data[angle][0]/20)
-            self.canvas.create_line(100,100, x, y, tags='data', fill='#888')
-            self.canvas.create_rectangle(x, y, x+1, y+1, fill='#800', outline='#800', tags='data')
-
-    def drawBackground(self):
-        self.backgroundID=self.canvas.create_rectangle(0,0,200,200, fill='#111')
-        
-    def setData(self, d):
-        self.data = d
-        self.drawData()
-
 class Cloud(Frame, object):
     def __init__(self,master, label, data):
         Frame.__init__(self, master)
         self.master = master
-        self.data = data # [x,y,theta]
+        self.data = data 
         self.text = label
         self.canvas = Canvas(self, width=200, height=200, bd=0)
         self.title = "Scan"
@@ -184,8 +158,49 @@ class Cloud(Frame, object):
             for angle in self.data.keys():
                 x = self.data[angle][0]/20
                 y = self.data[angle][1]/20
-                #self.canvas.create_line(100,100, 100-x, 100-y, tags='data', fill='#888')
-                self.canvas.create_rectangle(100-y, 100-x, 101-y, 101-x, fill='#888', outline='#888', tags='data')
+                self.canvas.create_line(100,100, 100-y, 100-x, tags='data', fill='#888')
+                self.canvas.create_rectangle(100-y, 100-x, 101-y, 101-x, fill='#800', outline='#800', tags='data')
+
+    def drawBackground(self):
+        self.backgroundID=self.canvas.create_rectangle(0,0,200,200, fill='#111')
+        
+    def setData(self, d):
+        self.data = d
+        self.drawData()
+
+class ForceCloud(Frame, object):
+    def __init__(self,master, label, data):
+        Frame.__init__(self, master)
+        self.master = master
+        self.data = data 
+        self.text = label
+        self.canvas = Canvas(self, width=200, height=200, bd=0)
+        self.title = "force"
+        self.label = Label
+        self.canvas.pack()
+        self.draw()
+        self.setData(self.data)
+        self.pack()
+
+    def draw(self):
+        self.drawBackground()
+        self.drawData()
+
+    def drawData(self):
+        self.canvas.delete('data')
+        self.canvas.create_text(100,10,fill="#888",font="Helvetica", text=self.text, width=200, tags='data')
+        if self.data:
+            for angle in self.data.keys():
+                x = self.data[angle][0]
+                y = self.data[angle][1]
+                f = self.data[angle][2]
+                colour = '#080'
+                if (f>33):
+                    colour = '#880'
+                if (f>66):
+                    colour = '#800'
+                self.canvas.create_line(100,100, 100-y, 100-x, tags='data', fill=colour)
+                #self.canvas.create_rectangle(100-y, 100-x, 101-y, 101-x, fill=colour, outline='#800', tags='data')
 
     def drawBackground(self):
         self.backgroundID=self.canvas.create_rectangle(0,0,200,200, fill='#111')
@@ -226,8 +241,8 @@ posePose = Pose(socket[0][1], "Pose", [10,100,45])
 poseTarget = Pose(socket[0][2], "Target", [110,10,0])
 poseTargetBearing = Pose(socket[0][3], "Target Bearing", [0, 56,12.2])
 
-scan1 = Scan(socket[1][0], "Snapshot", cloudData)
-cloud1 = Cloud(socket[1][1], "LIDAR cloud", None)
+cloud1 = Cloud(socket[1][0], "lidar", None)
+cloud2 = ForceCloud(socket[1][1], "force", None)
 
 root.mainloop()
 root.destroy()
