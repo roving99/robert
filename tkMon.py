@@ -52,16 +52,17 @@ TOPICNAMES = {  'drive/output/battery':doBattery,
                 'navigation/output/stearing':None,
                 }
 
+GLOBALSDEFINED = False
         
 def mqttOnMessage(client, userdata, msg):
     topic = str(msg.topic)
     print 'topic: '+topic
     payload = str(msg.payload)
     payload = json.loads(payload)
-    if topic in TOPICNAMES and TOPICNAMES[topic]:
+    if topic in TOPICNAMES and TOPICNAMES[topic] and GLOBALSDEFINED:
         print 'GO!'
         TOPICNAMES[topic](payload)
-
+        
 def mqttOnConnect(client, userdata, flags, rc):  # added 'flags' on work version of library?
     print("Connected with result code "+str(rc))
     # re subscribe here?
@@ -243,6 +244,8 @@ poseTargetBearing = Pose(socket[0][3], "Target Bearing", [0, 56,12.2])
 
 cloud1 = Cloud(socket[1][0], "lidar", None)
 cloud2 = ForceCloud(socket[1][1], "force", None)
+
+GLOBALSDEFINED = True
 
 root.mainloop()
 root.destroy()
