@@ -255,21 +255,36 @@ class ForceCloud(Frame, object):
         self.data = d
         self.drawData()
 
-def doButton1():
-    print '1'
-    pass
 
-def doButton2():
-    print '2'
-    pass
+def button_forward():
+    """go forward at 10cms-1"""
+    data = {"time":time.time(), "type":"", "data":[10, 10]} 
+    client.publish(topic='drive/input/motors', payload=json.dumps(data))
+
+def button_backward():
+    """go forward at 10cms-1"""
+    data = {"time":time.time(), "type":"", "data":[-10, -10]} 
+    client.publish(topic='drive/input/motors', payload=json.dumps(data))
     
-def doButton3():
-    print '3'
-    pass
-     
-def doButton4():
-    print '4'
-    pass   
+def button_stop():
+    """really?"""
+    data = {"time":time.time(), "type":"", "data":[0, 0]} 
+    client.publish(topic='drive/input/motors', payload=json.dumps(data))
+
+def button_left():
+    """turn left at 10cms-1"""
+    data = {"time":time.time(), "type":"", "data":[10, -10]} 
+    client.publish(topic='drive/input/motors', payload=json.dumps(data))
+
+def button_right():
+    """turn right at 10cms-1"""
+    data = {"time":time.time(), "type":"", "data":[-10, 10]} 
+    client.publish(topic='drive/input/motors', payload=json.dumps(data))
+
+def button_reset():
+    """Stop robot, reset odometry"""
+    data = {"time":time.time(), "type":"pose", "data":[0.0, 0.0, 0,0]} 
+    client.publish(topic='odometry/input/pose', payload=json.dumps(data))
 
 client = mqtt.Client()
 client.on_connect = mqttOnConnect
@@ -306,7 +321,7 @@ poseTargetBearing = Pose(socket[0][3], "Target Bearing", [0, 56,12.2])
 cloud1 = Cloud(socket[1][0], "lidar", None)
 cloud2 = ForceCloud(socket[1][1], "force", None)
 
-buttons = Buttons(socket[1][2], "buttons", { "button 1":doButton1, "no":doButton2, "perhaps":doButton3, "GO!":doButton4, "STOP!":doButton4})
+buttons = Buttons(socket[1][2], "buttons", { "forward":button_forward, "backward":button_backward, "STOP":button_stop, "left":button_left,"right":button_right,  })
 
 GLOBALSDEFINED = True
 

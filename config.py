@@ -1,9 +1,8 @@
 # defaults for all processes.
 """Global configuration constants."""
 
-IAMAROBOT  = True
+IAMAROBOT  = False
 
-#IAMAROBOT  = True
 
 if not IAMAROBOT:
 	MQTTIP = 'robert.local'
