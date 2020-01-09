@@ -182,13 +182,14 @@ if __name__=="__main__":
 
     last = time.time()
 
+    counter1 = 0
+    counter2 = 0
+
     while running:
         client.loop()
 
         battery = myLeo.send('12')  # battery level
         battery = int(battery,16)/10.0
-        data = {"time":time.time(), "type":"battery", "data":[battery]}
-        client.publish(topic='drive/output/battery', payload=json.dumps(data))
 
         counters = myLeo.send('14')
         old1 = counter1
@@ -202,7 +203,11 @@ if __name__=="__main__":
             client.publish(topic='drive/output/count', payload=json.dumps(data))
             data = {"time":time.time(), "type":"pose", "data":[md25Base.x, md25Base.y, math.degrees(md25Base.theta)]}
             client.publish(topic='odometry/output/pose', payload=json.dumps(data))
+            data = {"time":time.time(), "type":"battery", "data":[battery]}
+            client.publish(topic='drive/output/battery', payload=json.dumps(data))
             last = time.time()
+
+        time.sleep(0.2)
 
     myLeo.close()
     client.close()
