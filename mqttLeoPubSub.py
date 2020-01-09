@@ -8,6 +8,7 @@ import time
 import json
 import leo
 import robotBase
+import time 
 
 import config
 '''
@@ -178,23 +179,29 @@ if __name__=="__main__":
     thetaTarget = None
 
     running = True
+
+    last = time.time()
+
     while running:
         client.loop()
+
         battery = myLeo.send('12')  # battery level
         battery = int(battery,16)/10.0
-        counters = myLeo.send('14')
-        counter1 = hexToSigned(counters[0:8])
-        counter2 = hexToSigned(counters[8:16])
-        md25Base.update(counter1, counter2)
-
         data = {"time":time.time(), "type":"battery", "data":[battery]}
         client.publish(topic='drive/output/battery', payload=json.dumps(data))
-
-        data = {"time":time.time(), "type":"count", "data":[counter1, counter2]}
-        client.publish(topic='drive/output/count', payload=json.dumps(data))
-
-        data = {"time":time.time(), "type":"pose", "data":[md25Base.x, md25Base.y, math.degrees(md25Base.theta)]}
-        client.publish(topic='odometry/output/pose', payload=json.dumps(data))
+        
+        counters = myLeo.send('14')
+        old1 = counter1
+        old2 = counter2
+        counter1 = hexToSigned(counters[0:8])
+        counter2 = hexToSigned(counters[8:16])
+        if not(counter1==old1 and counter2==old2) or (time.time()-last>1.0):
+            md25Base.update(counter1, counter2)
+            data = {"time":time.time(), "type":"count", "data":[counter1, counter2]}
+            client.publish(topic='drive/output/count', payload=json.dumps(data))
+            data = {"time":time.time(), "type":"pose", "data":[md25Base.x, md25Base.y, math.degrees(md25Base.theta)]}
+            client.publish(topic='odometry/output/pose', payload=json.dumps(data))
+            last = time.time()
 
     myLeo.close()
     client.close()
