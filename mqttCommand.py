@@ -28,6 +28,7 @@ TOPICNAMES = { 'drive/output/battery':None,
                 'drive/output/count':None,
                 'odometry/output/pose':None,
                 'sense/output/lidar':None,
+                'sense/output/sonar':None,
                 }
 
 class MyPrompt(Cmd):

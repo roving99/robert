@@ -20,7 +20,7 @@ drive/input/raw    {"data": [<string>], }  raw command to controlling arduino
 drive/output/count {"data": [<motor left count>, <motor right count>], }   
 drive/output/battery   {"data": [<volts>], }   volts
 
-sense/output/sonar {"data": { <angle>: <distance>, <angle>:<distance>, ...}, } degree, cm
+sense/output/sonar {"data": [range0, range1, range2, range3], } cm
 sense/output/touch {"data": [ <touch0>, <touch1>, ...], }  0/1
 sense/output/cliff {"data": [ <cliff0>, <cliff1>, ...], }  0/1
 sense/output/compass   {"data": <bearing>, }   degree
@@ -180,12 +180,23 @@ if __name__=="__main__":
     running = True
     while running:
         client.loop()
+
         battery = myLeo.send('12')  # battery level
         battery = int(battery,16)/10.0
+
         counters = myLeo.send('14')
         counter1 = hexToSigned(counters[0:8])
         counter2 = hexToSigned(counters[8:16])
         md25Base.update(counter1, counter2)
+
+        sonar = myLeo.send('19')
+        sonar0 = hexToSigned(sonar[0:4])
+        sonar1 = hexToSigned(sonar[4:8])
+        sonar2 = hexToSigned(sonar[8:12])
+        sonar3 = hexToSigned(sonar[12:16])
+
+        data = {"time":time.time(), "type":"sonar", "data":[sonar0, sonar1, sonar2, sonar3]}
+        client.publish(topic='sense/output/sonar', payload=json.dumps(data))
 
         data = {"time":time.time(), "type":"battery", "data":[battery]}
         client.publish(topic='drive/output/battery', payload=json.dumps(data))
