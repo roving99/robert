@@ -21,7 +21,7 @@ drive/input/raw    {"data": [<string>], }  raw command to controlling arduino
 drive/output/count {"data": [<motor left count>, <motor right count>], }   
 drive/output/battery   {"data": [<volts>], }   volts
 
-sense/output/sonar {"data": { <angle>: <distance>, <angle>:<distance>, ...}, } degree, cm
+sense/output/sonar {"data": [range0, range1, range2, range3], } cm
 sense/output/touch {"data": [ <touch0>, <touch1>, ...], }  0/1
 sense/output/cliff {"data": [ <cliff0>, <cliff1>, ...], }  0/1
 sense/output/compass   {"data": <bearing>, }   degree
@@ -189,12 +189,13 @@ if __name__=="__main__":
         battery = int(battery,16)/10.0
         data = {"time":time.time(), "type":"battery", "data":[battery]}
         client.publish(topic='drive/output/battery', payload=json.dumps(data))
-        
+
         counters = myLeo.send('14')
         old1 = counter1
         old2 = counter2
         counter1 = hexToSigned(counters[0:8])
         counter2 = hexToSigned(counters[8:16])
+
         if not(counter1==old1 and counter2==old2) or (time.time()-last>1.0):
             md25Base.update(counter1, counter2)
             data = {"time":time.time(), "type":"count", "data":[counter1, counter2]}
